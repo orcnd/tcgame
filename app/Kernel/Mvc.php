@@ -25,15 +25,3 @@ class Mvc
         }
     }
 }
-
-//helper functions
-
-/**
- * dumping data with style
- */
-function odump($v)
-{
-    echo '<pre>';
-    var_dump($v);
-    echo '</pre>';
-}

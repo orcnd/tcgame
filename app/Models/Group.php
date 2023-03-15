@@ -6,6 +6,7 @@ class Group
 {
     public $id;
     public $name;
+
     /**
      * Get the display name of the user
      *
@@ -51,8 +52,9 @@ class Group
      */
     public function assignUser(User $user)
     {
+        self::removeUserFromAllGroups($user);
         \App\Kernel\Db::insertQuery(
-            'INSERT INTO tcgame_user_groups (user_id, group_id) VALUES (:user_id, :group_id)',
+            'INSERT INTO tcgame_user_groups (user_id, group_id,date_added) VALUES (:user_id, :group_id, NOW())',
             [
                 'user_id' => $user->id,
                 'group_id' => $this->id,
@@ -87,6 +89,21 @@ class Group
         }
     }
 
+    public static function findByUser(User $user)
+    {
+        $userGroup = \App\Kernel\Db::query(
+            'SELECT group_id FROM tcgame_user_groups WHERE user_id = :user_id',
+            [
+                'user_id' => $user->id,
+            ]
+        );
+
+        if ($userGroup !== false) {
+            return self::find($userGroup->group_id);
+        }
+        return false;
+    }
+
     /**
      * finds group by name
      *
@@ -117,6 +134,23 @@ class Group
     }
 
     /**
+     * removes user from all groups
+     *
+     * @param User $user
+     *
+     * @return void
+     */
+    public static function removeUserFromAllGroups(User $user)
+    {
+        \App\Kernel\Db::query(
+            'DELETE FROM tcgame_user_groups WHERE user_id = :user_id',
+            [
+                'user_id' => $user->id,
+            ]
+        );
+    }
+
+    /**
      * destroys group
      *
      * @return void
@@ -135,5 +169,25 @@ class Group
                 'group_id' => $this->id,
             ]
         );
+    }
+
+    public function findAvailableGroup()
+    {
+        $group = \App\Kernel\Db::query(
+            'SELECT id,name FROM tcgame_groups WHERE id NOT IN (SELECT group_id FROM tcgame_user_groups WHERE user_id = :user_id)',
+            [
+                'user_id' => $this->id,
+            ]
+        );
+
+        if ($group->rowCount() == 0) {
+            return false;
+        } else {
+            $group = \App\Kernel\Db::fetch($group);
+            $tempGroup = new Group();
+            $tempGroup->id = $group->id;
+            $tempGroup->name = $group->name;
+            return $tempGroup;
+        }
     }
 }

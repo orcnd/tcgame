@@ -41,4 +41,9 @@ class User
         $user->id = $id;
         return $user;
     }
+
+    public function group()
+    {
+        return \App\Models\Group::findByUser($this->id);
+    }
 }
