@@ -28,17 +28,12 @@ class Mvc
 
 //helper functions
 
-//dumping data with style
+/**
+ * dumping data with style
+ */
 function odump($v)
 {
     echo '<pre>';
     var_dump($v);
     echo '</pre>';
-}
-//simple http rediret
-function redirect($uri)
-{
-    $uri = str_replace('//', '/', $uri);
-    $adr = burl(true) . '/' . $uri;
-    header('location: ' . $adr);
 }

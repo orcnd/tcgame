@@ -24,23 +24,23 @@ class Init
      */
     public static function install($isTest = false)
     {
-        if (TEST_MODE) {
+        if (defined('TEST_MODE') && TEST_MODE) {
             \App\Kernel\Db::initializeTest();
         } else {
             \App\Kernel\Db::initialize();
         }
 
-        \App\Kernel\Db::createTable('users', [
+        \App\Kernel\Db::createTable('tcgame_users', [
             'id int(11) primary key AUTO_INCREMENT',
             'name varchar(255)',
         ]);
 
-        \App\Kernel\Db::createTable('groups', [
+        \App\Kernel\Db::createTable('tcgame_groups', [
             'id int(11) primary key AUTO_INCREMENT',
             'name varchar(255)',
         ]);
 
-        \App\Kernel\Db::createTable('user_groups', [
+        \App\Kernel\Db::createTable('tcgame_user_groups', [
             'id int(11) primary key AUTO_INCREMENT',
             'user_id int(11)',
             'group_id int(11)',

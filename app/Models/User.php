@@ -15,16 +15,23 @@ class User
      */
     public function getDisplayName(bool $withId): string
     {
-        if ($withId) {
+        if ($withId === true) {
             return '#' . $this->id . ' ' . $this->name;
         }
         return $this->name;
     }
 
-    public static function Create(array $data): User
+    /**
+     * creates user
+     *
+     * @param array $data
+     *
+     * @return User
+     */
+    public static function create(array $data): User
     {
         $id = \App\Kernel\Db::insertQuery(
-            'INSERT INTO users (name) VALUES (:name)',
+            'INSERT INTO tcgame_users (name) VALUES (:name)',
             [
                 'name' => $data['name'],
             ]

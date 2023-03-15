@@ -63,4 +63,30 @@ class Db
         $st->execute($prepared);
         return self::$pdo->lastInsertId();
     }
+
+    /**
+     * mysql query
+     *
+     * @param string $query
+     *
+     * @return mixed
+     */
+    public static function query(string $query, array $prepared)
+    {
+        $st = self::$pdo->prepare($query, $prepared);
+        $st->execute($prepared);
+        return $st;
+    }
+
+    /**
+     * fetch data
+     *
+     * @param \PDOStatement $state
+     *
+     * @return mixed
+     */
+    public static function fetch(\PDOStatement $state)
+    {
+        return $state->fetch(PDO::FETCH_OBJ);
+    }
 }
