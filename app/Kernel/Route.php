@@ -1,6 +1,6 @@
 <?php
 namespace App\Kernel;
-class Routes
+class Route
 {
     private static $routes = [];
 
@@ -16,7 +16,7 @@ class Routes
     public static function set(
         string $route,
         string $method,
-        callable $callback
+        callable|array $callback
     ) {
         $method = strtoupper(trim($method));
 

@@ -44,13 +44,13 @@ class Group
     }
 
     /**
-     * assigns user to group
+     * join user to group
      *
      * @param User $user
      *
      * @return void
      */
-    public function assignUser(User $user)
+    public function join(User $user)
     {
         self::removeUserFromAllGroups($user);
         \App\Kernel\Db::insertQuery(
@@ -189,5 +189,74 @@ class Group
             $tempGroup->name = $group->name;
             return $tempGroup;
         }
+    }
+
+    public function getAll($filter = [])
+    {
+        $query = 'SELECT id FROM tcgame_groups';
+        $params = [];
+        if (isset($filter['id'])) {
+            $query .= ' WHERE id = :id';
+            $params['id'] = $filter['id'];
+        }
+        $groups = \App\Kernel\Db::query($query, $params);
+        $groups = \App\Kernel\Db::fetch($groups);
+        $result = [];
+        foreach ($groups as $group) {
+            $result[] = self::find($group->id);
+        }
+        return $result;
+    }
+
+    public function getUserCount()
+    {
+        $count = \App\Kernel\Db::query(
+            'SELECT COUNT(*) FROM tcgame_user_groups WHERE group_id = :group_id',
+            [
+                'group_id' => $this->id,
+            ]
+        );
+        $count = $count->fetchColumn();
+        return $count;
+    }
+
+    public function users()
+    {
+        $waiters = \App\Kernel\Db::query(
+            'SELECT user_id FROM tcgame_user_groups WHERE group_id = :group_id',
+            [
+                'group_id' => $this->id,
+            ]
+        );
+        $waiters = \App\Kernel\Db::fetch($waiters);
+        $result = [];
+        foreach ($waiters as $waiter) {
+            $result[] = User::find($waiter->user_id);
+        }
+        return $result;
+    }
+
+    public static function getWaiterCount()
+    {
+        $groups = self::getAll();
+        $result = [];
+        foreach ($groups as $group) {
+            if ($group->getUserCount() < 4) {
+                $result[] = $group;
+            }
+        }
+        return $result;
+    }
+
+    public static function getWaitingList()
+    {
+        $groups = self::getAll();
+        $result = [];
+        foreach ($groups as $group) {
+            if ($group->getUserCount() == 4) {
+                array_push($result, $group->users());
+            }
+        }
+        return $result;
     }
 }

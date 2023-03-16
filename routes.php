@@ -1,7 +1,17 @@
 <?php
 namespace App;
-use App\Kernel\Routes;
+use App\Kernel\Route;
 
-Routes::set('/', 'GET', function () {
-    view('home');
-});
+use App\Controllers\MainController;
+use App\Controllers\UserController;
+use App\Controllers\GameController;
+
+Route::set('/', 'GET', [MainController::class, 'index']);
+
+Route::set('/login', 'GET', [UserController::class, 'login']);
+Route::set('/login', 'POST', [UserController::class, 'login']);
+
+Route::set('/logout', 'GET', [UserController::class, 'logout']);
+
+Route::set('/game', 'GET', [GameController::class, 'index']);
+Route::set('/join', 'GET', [GameController::class, 'join']);

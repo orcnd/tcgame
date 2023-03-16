@@ -1,6 +1,8 @@
 <?php
 namespace App\Models;
 
+use App\Kernel\Db;
+
 class User
 {
     public $id;
@@ -30,20 +32,73 @@ class User
      */
     public static function create(array $data): User
     {
-        $id = \App\Kernel\Db::insertQuery(
-            'INSERT INTO tcgame_users (name) VALUES (:name)',
+        if (isset($data['status']) === false) {
+            $data['status'] = 0;
+        }
+        $id = Db::insertQuery(
+            'INSERT INTO tcgame_users (name,status) VALUES (:name, :status)',
             [
                 'name' => $data['name'],
+                'status' => $data['status'],
             ]
         );
-        $user = new User();
-        $user->name = $data['name'];
-        $user->id = $id;
-        return $user;
+        return self::find($id);
     }
 
+    /**
+     * get users group
+     *
+     * @return Group
+     */
     public function group()
     {
         return \App\Models\Group::findByUser($this->id);
+    }
+
+    /**
+     * finds user by id
+     *
+     * @param int $id
+     *
+     * @return User|null
+     */
+    public static function find(int $id)
+    {
+        $user = Db::query('SELECT * FROM tcgame_users WHERE id=:id', [
+            'id' => $id,
+        ]);
+        if ($user->rowCount() > 0) {
+            $userData = Db::fetch($user);
+            return self::fetchUser($userData);
+        }
+        return null;
+    }
+
+    private static function fetchUser($userData)
+    {
+        $user = new User();
+        $user->id = $userData->id;
+        $user->name = $userData->name;
+        $user->status = $userData->status;
+        return $user;
+    }
+
+    /**
+     * finds user by username
+     *
+     * @param string $username
+     *
+     * @return User|null
+     */
+    public static function findByUsername(string $username)
+    {
+        $user = Db::query('SELECT * FROM tcgame_users WHERE name=:name', [
+            'name' => $username,
+        ]);
+        if ($user->rowCount() > 0) {
+            $userData = Db::fetch($user);
+            return self::fetchUser($userData);
+        }
+        return null;
     }
 }
