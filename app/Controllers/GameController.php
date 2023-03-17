@@ -11,12 +11,21 @@ class GameController
 
     public function index()
     {
+        /*
+        if (
+            auth()
+                ->user()
+                ->group() !== null
+        ) {
+            redirect('/group');
+        }
+        */
         view('game');
     }
 
     public function homeStats()
     {
-        return json([
+        json([
             'active_games' => count(Group::getActiveGames()),
             'active_players' => count(Group::getActivePlayers()),
             'waiting_players' => count(Group::getWaitingList()),
@@ -25,11 +34,31 @@ class GameController
 
     public function join()
     {
-        $availableGroups = Group::findAvailableGroups(auth()->user());
+        $availableGroups = Group::getAll();
 
         view('join', ['availableGroups' => $availableGroups]);
     }
 
+    public function joinGroup($params = [])
+    {
+        if (count($params) == 1) {
+            $id = $params[0];
+        } else {
+            redirect('/join');
+        }
+
+        $group = Group::find($id);
+        if ($group === null) {
+            redirect('/join');
+        }
+
+        $status = $group->join(auth()->user());
+        if ($status === true) {
+            redirect('/group');
+        } else {
+            view('/basicError', ['message' => $status, 'goBack' => true]);
+        }
+    }
     public function new_group()
     {
         $group = Group::create([
@@ -50,5 +79,18 @@ class GameController
             redirect('/game');
         }
         view('group', ['group' => $group]);
+    }
+
+    public function groupWaitList()
+    {
+        $group = auth()
+            ->user()
+            ->group();
+        $users = $group->users();
+        $hash = md5(json_encode($users)); //for caching purposes
+        if (isset($_POST['oldData']) && $_POST['oldData'] == $hash) {
+            json(['users' => [], 'hash' => $hash, 'update' => false]);
+        }
+        json(['users' => $users, 'hash' => $hash, 'update' => true]);
     }
 }

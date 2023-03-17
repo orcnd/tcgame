@@ -74,11 +74,17 @@ class Group
      *
      * @param User $user
      *
-     * @return void
+     * @return string|bool
      */
-    public function join(User $user)
+    public function join(User $user) : string|bool
     {
-        self::removeUserFromAllGroups($user);
+        if ($user->status == 1) {
+            return "already playing";
+        }
+        //self::removeUserFromAllGroups($user);
+        if ($user->group()->id == $this->id) {
+            return "already in group";
+        }
         Db::insertQuery(
             'INSERT INTO tcgame_user_groups (user_id, group_id,date_added) VALUES (:user_id, :group_id, NOW())',
             [
@@ -88,6 +94,7 @@ class Group
         );
         $user->status = 1;
         $user->save();
+        return true;
     }
 
     /**
@@ -262,7 +269,7 @@ class Group
         if ($groups->rowCount() == 0) {
             return [];
         } else {
-            $groups = Db::fetch($groups);
+            $groups = Db::fetchALL($groups);
             $result = [];
             foreach ($groups as $group) {
                 $group = self::find($group->id);
@@ -284,7 +291,7 @@ class Group
         $query = 'SELECT id FROM tcgame_groups';
 
         $groups = Db::query($query, []);
-        $groups = Db::fetch($groups);
+        $groups = Db::fetchAll($groups);
         $result = [];
         if (is_array($groups)) {
             foreach ($groups as $group) {
@@ -327,6 +334,9 @@ class Group
         foreach ($waiters as $waiter) {
             $user=User::find($waiter->user_id);
             $user->date_added=$waiter->date_added;
+            if ($user->id==$this->creator_id) {
+                $user->is_creator=true;
+            }
             $result[] = $user;
         }
         return $result;

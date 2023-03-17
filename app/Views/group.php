@@ -30,18 +30,10 @@
     <div class="row">
         <div class="col-4">
             <h4>Players</h4>
-            <?php foreach ($group->users() as $user) {
-                echo $user->name;
-                if ($group->creator_id == $user->id) {
-                    echo ' (Creator)';
-                }
-                if (auth()->user()->id == $user->id) {
-                    echo ' (You added at `' .
-                        betterDate($user->date_added) .
-                        '`)';
-                }
-                echo '<br>';
-            } ?>
+            <ul id="players">
+
+            </ul>
+            
             
         </div>
     </div>

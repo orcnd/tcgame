@@ -1,7 +1,5 @@
 $(document).ready(function () {
-  setInterval(function () {
-    getStats()
-  }, 2000)
+  setInterval(getStats, 2000)
   getStats()
 })
 
