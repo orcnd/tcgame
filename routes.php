@@ -17,3 +17,7 @@ Route::set('/game', 'GET', [GameController::class, 'index']);
 Route::set('/join', 'GET', [GameController::class, 'join']);
 
 Route::set('/game_home_stats', 'POST', [GameController::class, 'homeStats']);
+
+Route::set('/new_group', 'GET', [GameController::class, 'new_group']);
+
+Route::set('/group', 'GET', [GameController::class, 'group']);

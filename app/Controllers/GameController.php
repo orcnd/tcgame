@@ -22,4 +22,28 @@ class GameController
             'waiting_players' => count(Group::getWaitingList()),
         ]);
     }
+
+    public function join()
+    {
+        $availableGroups = Group::findAvailableGroups(auth()->user());
+
+        view('join', ['availableGroups' => $availableGroups]);
+    }
+
+    public function new_group()
+    {
+        $group = Group::create([
+            'name' => 'Group Game (' . date('d/m/Y H:i:s') . ')',
+        ]);
+        $group->join(auth()->user());
+        redirect('/group/' . $group->id);
+    }
+
+    public function group()
+    {
+        $group = auth()
+            ->user()
+            ->group();
+        odump($group);
+    }
 }

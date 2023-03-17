@@ -43,6 +43,21 @@ class Group
         return $group;
     }
 
+    /** 
+     * saves changes of group
+     * 
+     * @return void
+     */
+    public function save() {
+        \App\Kernel\Db::insertQuery(
+            'UPDATE tcgame_groups SET name = :name WHERE id = :id',
+            [
+                'name' => $this->name,
+                'id' => $this->id,
+            ]
+        );
+    }
+
     /**
      * join user to group
      *
@@ -60,6 +75,8 @@ class Group
                 'group_id' => $this->id,
             ]
         );
+        $user->status = 1;
+        $user->save();
     }
 
     /**
@@ -69,10 +86,10 @@ class Group
      *
      * @return Group|bool
      */
-    public static function find(int $id): mixed
+    public static function find(int $id): Group|bool
     {
         $group = \App\Kernel\Db::query(
-            'SELECT id,name FROM groups WHERE id = :id',
+            'SELECT id,name FROM tcgame_groups WHERE id = :id',
             [
                 'id' => $id,
             ]
@@ -93,8 +110,10 @@ class Group
      * finds group by user
      *
      * @param User $user
+     * 
+     * @return Group|bool
      */
-    public static function findByUser(User $user): mixed
+    public static function findByUser(User $user): Group|bool
     {
         $userGroup = \App\Kernel\Db::query(
             'SELECT group_id FROM tcgame_user_groups WHERE user_id = :user_id',
@@ -103,7 +122,8 @@ class Group
             ]
         );
 
-        if ($userGroup !== false) {
+        if ($userGroup->rowCount() > 0) {
+            $userGroup= \App\Kernel\Db::fetch($userGroup);
             return self::find($userGroup->group_id);
         }
         return false;
@@ -179,25 +199,31 @@ class Group
     /**
      * finds available group
      *
-     * @return Group|bool
+     * @param User $user
+     *
+     * @return array
      */
-    public function findAvailableGroup(): mixed
+    public static function findAvailableGroups(User $user): array
     {
-        $group = \App\Kernel\Db::query(
-            'SELECT id,name FROM tcgame_groups WHERE id NOT IN (SELECT group_id FROM tcgame_user_groups WHERE user_id = :user_id)',
+        $groups = \App\Kernel\Db::query(
+            'SELECT id FROM tcgame_groups WHERE id NOT IN (SELECT group_id FROM tcgame_user_groups WHERE user_id = :user_id)',
             [
-                'user_id' => $this->id,
+                'user_id' => $user->id,
             ]
         );
 
-        if ($group->rowCount() == 0) {
-            return false;
+        if ($groups->rowCount() == 0) {
+            return [];
         } else {
-            $group = \App\Kernel\Db::fetch($group);
-            $tempGroup = new Group();
-            $tempGroup->id = $group->id;
-            $tempGroup->name = $group->name;
-            return $tempGroup;
+            $groups = \App\Kernel\Db::fetch($groups);
+            $result = [];
+            foreach ($groups as $group) {
+                $group = self::find($group->id);
+                if (count($group->users()) < 4) {
+                    $result[] = $group;
+                }
+            }
+            return $result;
         }
     }
 

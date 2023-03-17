@@ -52,7 +52,7 @@ class User
      */
     public function group()
     {
-        return \App\Models\Group::findByUser($this->id);
+        return \App\Models\Group::findByUser($this);
     }
 
     /**
@@ -72,6 +72,24 @@ class User
             return self::fetchUser($userData);
         }
         return null;
+    }
+
+    /**
+     * saves changes of user
+     *
+     * @return void
+     */
+
+    public function save()
+    {
+        Db::insertQuery(
+            'UPDATE tcgame_users SET name=:name, status=:status WHERE id=:id',
+            [
+                'name' => $this->name,
+                'status' => $this->status,
+                'id' => $this->id,
+            ]
+        );
     }
 
     private static function fetchUser($userData)
