@@ -57,6 +57,7 @@ body {
 
 <main class="form-signin text-center">
   <form method="post">
+    <?php input_csrf_token(); ?>
     <h1>TC Game</h1>
     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
     <?php if (isset($errors)) {

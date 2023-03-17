@@ -69,7 +69,7 @@ class Group
      *
      * @return Group|bool
      */
-    public static function find(int $id)
+    public static function find(int $id): mixed
     {
         $group = \App\Kernel\Db::query(
             'SELECT id,name FROM groups WHERE id = :id',
@@ -89,7 +89,12 @@ class Group
         }
     }
 
-    public static function findByUser(User $user)
+    /**
+     * finds group by user
+     *
+     * @param User $user
+     */
+    public static function findByUser(User $user): mixed
     {
         $userGroup = \App\Kernel\Db::query(
             'SELECT group_id FROM tcgame_user_groups WHERE user_id = :user_id',
@@ -171,7 +176,12 @@ class Group
         );
     }
 
-    public function findAvailableGroup()
+    /**
+     * finds available group
+     *
+     * @return Group|bool
+     */
+    public function findAvailableGroup(): mixed
     {
         $group = \App\Kernel\Db::query(
             'SELECT id,name FROM tcgame_groups WHERE id NOT IN (SELECT group_id FROM tcgame_user_groups WHERE user_id = :user_id)',
@@ -191,19 +201,22 @@ class Group
         }
     }
 
-    public function getAll($filter = [])
+    /**
+     * returns all groups
+     *
+     * @return array
+     */
+    public static function getAll(): array
     {
         $query = 'SELECT id FROM tcgame_groups';
-        $params = [];
-        if (isset($filter['id'])) {
-            $query .= ' WHERE id = :id';
-            $params['id'] = $filter['id'];
-        }
-        $groups = \App\Kernel\Db::query($query, $params);
+
+        $groups = \App\Kernel\Db::query($query, []);
         $groups = \App\Kernel\Db::fetch($groups);
         $result = [];
-        foreach ($groups as $group) {
-            $result[] = self::find($group->id);
+        if (is_array($groups)) {
+            foreach ($groups as $group) {
+                $result[] = self::find($group->id);
+            }
         }
         return $result;
     }
@@ -220,7 +233,12 @@ class Group
         return $count;
     }
 
-    public function users()
+    /**
+     * returns all users in group
+     *
+     * @return array
+     */
+    public function users(): array
     {
         $waiters = \App\Kernel\Db::query(
             'SELECT user_id FROM tcgame_user_groups WHERE group_id = :group_id',
@@ -236,19 +254,46 @@ class Group
         return $result;
     }
 
-    public static function getWaiterCount()
+    /**
+     * returns all active games
+     *
+     * @return array
+     */
+    public static function getActiveGames(): array
     {
         $groups = self::getAll();
         $result = [];
         foreach ($groups as $group) {
-            if ($group->getUserCount() < 4) {
+            if ($group->getUserCount() == 4) {
                 $result[] = $group;
             }
         }
         return $result;
     }
 
-    public static function getWaitingList()
+    /**
+     * returns all active players
+     *
+     * @return array
+     */
+    public static function getActivePlayers(): array
+    {
+        $groups = self::getAll();
+        $result = [];
+        foreach ($groups as $group) {
+            if ($group->getUserCount() == 4) {
+                array_push($result, $group->users());
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * returns waiting list
+     *
+     * @return array
+     */
+    public static function getWaitingList(): array
     {
         $groups = self::getAll();
         $result = [];

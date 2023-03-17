@@ -34,7 +34,19 @@ class Mvc
                 $controller = new $callback[0]();
                 $callback = [$controller, $callback[1]];
             }
-
+            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                if (
+                    isset($_SERVER['HTTP_X-CSRF-TOKEN']) ||
+                    isset($_POST['_token'])
+                ) {
+                    $token = isset($_SERVER['HTTP_X-CSRF-TOKEN'])
+                        ? $_SERVER['HTTP_X-CSRF-TOKEN']
+                        : $_POST['_token'];
+                    if (csrf_token($token) === false) {
+                        show_400('Bad Request Token');
+                    }
+                }
+            }
             call_user_func($callback);
         } else {
             $this->c404();

@@ -42,6 +42,8 @@ function odump($v)
 
 /**
  * shows 404 page
+ *
+ * @param bool $basicMode if true, it will not use the view
  */
 function show_404($basicMode = false)
 {
@@ -49,6 +51,20 @@ function show_404($basicMode = false)
     // this provides a basic 404 page for the case that the view is not found
     if ($basicMode === false) {
         view('404');
+    }
+    exit();
+}
+
+/**
+ * show 400 page
+ *
+ * @param string|null $detail
+ */
+function show_400($detail = null)
+{
+    header('HTTP/1.0 400 Bad Request');
+    if ($detail !== null) {
+        echo $detail;
     }
     exit();
 }
@@ -86,4 +102,56 @@ function old($key)
         return $_POST[$key];
     }
     return '';
+}
+
+/**
+ * returns csrf token
+ *
+ * @param string|null $controlToken if not null, it will be compared with the session token
+ *
+ * @return string|boolean
+ */
+function csrf_token($controlToken = null)
+{
+    @session_start();
+    $tokenToBe = md5(session_id() . 'token');
+    if ($controlToken !== null) {
+        if ($controlToken === $tokenToBe) {
+            return true;
+        }
+        return false;
+    }
+    if (!isset($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = $tokenToBe;
+    }
+    return $_SESSION['csrf_token'];
+}
+
+/**
+ * returns csrf token input
+ *
+ * @param bool $return if true, it will return the input, if false, it will echo the input
+ *
+ * @return string
+ */
+function input_csrf_token($return = false): string
+{
+    if ($return === true) {
+        return '<input type="hidden" name="_token" value="' .
+            csrf_token() .
+            '">';
+    } else {
+        echo '<input type="hidden" name="_token" value="' . csrf_token() . '">';
+        return '';
+    }
+}
+
+/**
+ * returns json
+ */
+function json($data)
+{
+    header('Content-Type: application/json');
+    echo json_encode($data);
+    exit();
 }
