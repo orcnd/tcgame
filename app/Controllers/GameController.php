@@ -56,7 +56,13 @@ class GameController
         if ($status === true) {
             redirect('/group');
         } else {
-            view('/basicError', ['message' => $status, 'goBack' => true]);
+            if ($status == 'alreadyIn') {
+                $message =
+                    'You are already in a game. return to game <a href="/group">here</a>';
+            } else {
+                $message = $status;
+            }
+            view('/basicError', ['message' => $message, 'goBack' => true]);
         }
     }
     public function new_group()

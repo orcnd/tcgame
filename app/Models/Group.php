@@ -78,12 +78,9 @@ class Group
      */
     public function join(User $user) : string|bool
     {
-        if ($user->status == 1) {
-            return "already playing";
-        }
         //self::removeUserFromAllGroups($user);
         if ($user->group()->id == $this->id) {
-            return "already in group";
+            return "alreadyIn";
         }
         Db::insertQuery(
             'INSERT INTO tcgame_user_groups (user_id, group_id,date_added) VALUES (:user_id, :group_id, NOW())',
@@ -159,8 +156,8 @@ class Group
      */
     public static function bindToUser(User $user): Group|bool {
         $group=self::findByUser($user);
-        $group->user=$user;
         if ($group) {
+            $group->user=$user;
             $user->group=$group;
             return $group;
         }

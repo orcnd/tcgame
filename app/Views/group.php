@@ -17,7 +17,7 @@
             <a href="/join" class="btn btn-primary btn-lg">Stop the game Now!</a>
             <?php }
             } ?>
-            
+            <hr>
             <span>
             <b> Status: </b><?php echo $group->status == 0
                 ? 'Waiting'

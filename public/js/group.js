@@ -20,7 +20,9 @@ function getUsers() {
       for (var i = 0; i < data.users.length; i++) {
         var str = '<li>' + data.users[i].name
         str += ' (' + data.users[i].date_added + ')'
-
+        if (data.users[i].is_creator) {
+          str += ' (Creator)'
+        }
         if (window.user.id == parseInt(data.users[i].id)) {
           str += ' (You)'
         }
