@@ -4,12 +4,14 @@ namespace App;
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../routes.php';
 
+use App\Kernel\Db;
+
 class Init
 {
     public function initialize()
     {
         //initialize database
-        \App\Kernel\Db::initialize();
+        Db::initialize();
 
         \App\Kernel\Auth::initialize();
 
@@ -27,34 +29,35 @@ class Init
     public static function install($isTest = false)
     {
         if (defined('TEST_MODE') && TEST_MODE) {
-            \App\Kernel\Db::initializeTest();
+            Db::initializeTest();
         } else {
-            \App\Kernel\Db::initialize();
+            Db::initialize();
         }
 
-        \App\Kernel\Db::createTable('tcgame_users', [
+        DB::dropTable(['tcgame_users', 'tcgame_groups', 'tcgame_user_groups']);
+
+        Db::createTable('tcgame_users', [
             'id int(11) primary key AUTO_INCREMENT',
             'name varchar(255)',
             'status int(11)',
         ]);
 
-        \App\Kernel\Db::createTable('tcgame_groups', [
+        Db::createTable('tcgame_groups', [
             'id int(11) primary key AUTO_INCREMENT',
             'name varchar(255)',
+            'creator_id int(11)',
+            'status int(11)',
         ]);
 
-        \App\Kernel\Db::createTable('tcgame_user_groups', [
+        Db::createTable('tcgame_user_groups', [
             'id int(11) primary key AUTO_INCREMENT',
             'user_id int(11)',
             'group_id int(11)',
             'sort int(11)',
             'date_added timestamp',
         ]);
+
         require __DIR__ . '/helpers.php';
-        //avoiding conflicts while populating tables
-        \App\Kernel\Db::query('delete from tcgame_users', []);
-        \App\Kernel\Db::query('delete from tcgame_groups', []);
-        \App\Kernel\Db::query('delete from tcgame_user_groups', []);
 
         $users = availableUserNames();
         foreach ($users as $user) {

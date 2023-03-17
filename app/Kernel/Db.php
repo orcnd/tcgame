@@ -23,6 +23,23 @@ class Db
     }
 
     /**
+     * drop table(s)
+     *
+     * @param array|string $tables table or tables
+     *
+     * @return void
+     */
+    public static function dropTable($tables)
+    {
+        if (!is_array($tables)) {
+            $tables = [$tables];
+        }
+        foreach ($tables as $table) {
+            self::$pdo->query('DROP TABLE IF EXISTS ' . $table);
+        }
+    }
+
+    /**
      * create a new table
      *
      * @param string $name table name
@@ -88,5 +105,17 @@ class Db
     public static function fetch(\PDOStatement $state)
     {
         return $state->fetch(PDO::FETCH_OBJ);
+    }
+
+    /**
+     * fetch all data
+     *
+     * @param \PDOStatement $state
+     *
+     * @return mixed
+     */
+    public static function fetchAll(\PDOStatement $state)
+    {
+        return $state->fetchAll(PDO::FETCH_OBJ);
     }
 }

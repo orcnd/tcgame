@@ -33,7 +33,8 @@ class GameController
     public function new_group()
     {
         $group = Group::create([
-            'name' => 'Group Game (' . date('d/m/Y H:i:s') . ')',
+            'name' => 'Group Game (' . betterDate() . ')',
+            'creator_id' => auth()->user()->id,
         ]);
         $group->join(auth()->user());
         redirect('/group');

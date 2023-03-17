@@ -155,3 +155,18 @@ function json($data)
     echo json_encode($data);
     exit();
 }
+
+/**
+ * return human readable eu date
+ *
+ * @param string|null $time
+ */
+function betterDate($time = null)
+{
+    if ($time === null) {
+        $time = time();
+    } else {
+        $time = strtotime($time);
+    }
+    return date('d/m/Y H:i:s', $time);
+}

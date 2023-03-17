@@ -1,4 +1,4 @@
-<?php view('header', ['title' => 'Game', 'scripts' => ['/js/game.js']]); ?>
+<?php view('header', ['title' => 'Join Game', 'scripts' => ['/js/game.js']]); ?>
 
 <div class="container">
 

@@ -52,7 +52,7 @@ class User
      */
     public function group()
     {
-        return \App\Models\Group::findByUser($this);
+        return \App\Models\Group::bindToUser($this);
     }
 
     /**

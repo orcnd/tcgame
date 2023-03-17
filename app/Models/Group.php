@@ -2,10 +2,12 @@
 namespace App\Models;
 
 use App\Models\User;
+use App\Kernel\Db;
 class Group
 {
-    public $id;
-    public $name;
+    public $id,$name,$creator_id,$status;
+
+    protected static $fillable=['name','creator_id','status'];
 
     /**
      * Get the display name of the user
@@ -31,15 +33,20 @@ class Group
      */
     public static function create(array $data): Group
     {
-        $id = \App\Kernel\Db::insertQuery(
-            'INSERT INTO tcgame_groups (name) VALUES (:name)',
+        $id = Db::insertQuery(
+            'INSERT INTO tcgame_groups (name,creator_id,status) VALUES (:name,:creator_id,:status)',
             [
                 'name' => $data['name'],
+                'creator_id' => $data['creator_id'],
+                'status' => $data['status'],
             ]
         );
         $group = new Group();
-        $group->name = $data['name'];
+        foreach (self::$fillable as $key) {
+            $group->$key = $data[$key];
+        }
         $group->id = $id;
+
         return $group;
     }
 
@@ -49,13 +56,17 @@ class Group
      * @return void
      */
     public function save() {
-        \App\Kernel\Db::insertQuery(
-            'UPDATE tcgame_groups SET name = :name WHERE id = :id',
-            [
-                'name' => $this->name,
-                'id' => $this->id,
-            ]
-        );
+
+        $sql='UPDATE tcgame_groups SET ';
+        $params=[];
+        foreach (self::$fillable as $key) {
+            $sql.=$key.'=:'.$key.',';
+            $params[$key]=$this->$key;
+        }
+        $sql=substr($sql,0,-1);
+        $sql.=' WHERE id=:id';
+        $params['id']=$this->id;
+        Db::insertQuery($sql,$params);
     }
 
     /**
@@ -68,7 +79,7 @@ class Group
     public function join(User $user)
     {
         self::removeUserFromAllGroups($user);
-        \App\Kernel\Db::insertQuery(
+        Db::insertQuery(
             'INSERT INTO tcgame_user_groups (user_id, group_id,date_added) VALUES (:user_id, :group_id, NOW())',
             [
                 'user_id' => $user->id,
@@ -88,8 +99,8 @@ class Group
      */
     public static function find(int $id): Group|bool
     {
-        $group = \App\Kernel\Db::query(
-            'SELECT id,name FROM tcgame_groups WHERE id = :id',
+        $group = Db::query(
+            'SELECT * FROM tcgame_groups WHERE id = :id',
             [
                 'id' => $id,
             ]
@@ -98,10 +109,12 @@ class Group
         if ($group->rowCount() == 0) {
             return false;
         } else {
-            $group = \App\Kernel\Db::fetch($group);
+            $group = Db::fetch($group);
             $tempGroup = new Group();
             $tempGroup->id = $group->id;
-            $tempGroup->name = $group->name;
+            foreach (self::$fillable as $key) {
+                $tempGroup->$key = $group->$key;
+            }
             return $tempGroup;
         }
     }
@@ -115,7 +128,7 @@ class Group
      */
     public static function findByUser(User $user): Group|bool
     {
-        $userGroup = \App\Kernel\Db::query(
+        $userGroup = Db::query(
             'SELECT group_id FROM tcgame_user_groups WHERE user_id = :user_id',
             [
                 'user_id' => $user->id,
@@ -123,8 +136,42 @@ class Group
         );
 
         if ($userGroup->rowCount() > 0) {
-            $userGroup= \App\Kernel\Db::fetch($userGroup);
+            $userGroup= Db::fetch($userGroup);
             return self::find($userGroup->group_id);
+        }
+        return false;
+    }
+
+
+    /**
+     * bind group model by user
+     *
+     * @param User $user
+     * 
+     * @return Group|bool
+     */
+    public static function bindToUser(User $user): Group|bool {
+        $group=self::findByUser($user);
+        $group->user=$user;
+        if ($group) {
+            $user->group=$group;
+            return $group;
+        }
+        return false;
+    }
+
+    public function added_at(): bool|string {
+        if(!$this->user) return false;
+        $added_at=Db::query(
+            'SELECT date_added FROM tcgame_user_groups WHERE user_id = :user_id AND group_id = :group_id',
+            [
+                'user_id' => $this->user->id,
+                'group_id' => $this->id,
+            ]
+        );
+        if ($added_at->rowCount() > 0) {
+            $added_at= Db::fetch($added_at);
+            return $added_at->date_added;
         }
         return false;
     }
@@ -138,14 +185,14 @@ class Group
      */
     public function removeUser(User $user)
     {
-        \App\Kernel\Db::query(
+        Db::query(
             'DELETE FROM tcgame_user_groups WHERE user_id = :user_id AND group_id = :group_id',
             [
                 'user_id' => $user->id,
                 'group_id' => $this->id,
             ]
         );
-        $groupUsersCount = \App\Kernel\Db::query(
+        $groupUsersCount = Db::query(
             'SELECT COUNT(*) FROM tcgame_user_groups WHERE group_id = :group_id',
             [
                 'group_id' => $this->id,
@@ -167,7 +214,7 @@ class Group
      */
     public static function removeUserFromAllGroups(User $user)
     {
-        \App\Kernel\Db::query(
+        Db::query(
             'DELETE FROM tcgame_user_groups WHERE user_id = :user_id',
             [
                 'user_id' => $user->id,
@@ -182,13 +229,13 @@ class Group
      */
     public function destroy()
     {
-        \App\Kernel\Db::query(
+        Db::query(
             'DELETE FROM tcgame_user_groups WHERE group_id = :group_id',
             [
                 'group_id' => $this->id,
             ]
         );
-        \App\Kernel\Db::query(
+        Db::query(
             'DELETE FROM tcgame_groups WHERE id = :group_id',
             [
                 'group_id' => $this->id,
@@ -205,7 +252,7 @@ class Group
      */
     public static function findAvailableGroups(User $user): array
     {
-        $groups = \App\Kernel\Db::query(
+        $groups = Db::query(
             'SELECT id FROM tcgame_groups WHERE id NOT IN (SELECT group_id FROM tcgame_user_groups WHERE user_id = :user_id)',
             [
                 'user_id' => $user->id,
@@ -215,7 +262,7 @@ class Group
         if ($groups->rowCount() == 0) {
             return [];
         } else {
-            $groups = \App\Kernel\Db::fetch($groups);
+            $groups = Db::fetch($groups);
             $result = [];
             foreach ($groups as $group) {
                 $group = self::find($group->id);
@@ -236,8 +283,8 @@ class Group
     {
         $query = 'SELECT id FROM tcgame_groups';
 
-        $groups = \App\Kernel\Db::query($query, []);
-        $groups = \App\Kernel\Db::fetch($groups);
+        $groups = Db::query($query, []);
+        $groups = Db::fetch($groups);
         $result = [];
         if (is_array($groups)) {
             foreach ($groups as $group) {
@@ -249,7 +296,7 @@ class Group
 
     public function getUserCount()
     {
-        $count = \App\Kernel\Db::query(
+        $count = Db::query(
             'SELECT COUNT(*) FROM tcgame_user_groups WHERE group_id = :group_id',
             [
                 'group_id' => $this->id,
@@ -266,16 +313,21 @@ class Group
      */
     public function users(): array
     {
-        $waiters = \App\Kernel\Db::query(
-            'SELECT user_id FROM tcgame_user_groups WHERE group_id = :group_id',
+        $waiters = Db::query(
+            'SELECT user_id,date_added FROM tcgame_user_groups WHERE group_id = :group_id',
             [
                 'group_id' => $this->id,
             ]
         );
-        $waiters = \App\Kernel\Db::fetch($waiters);
+        if ($waiters->rowCount() == 0) {
+            return [];
+        }
+        $waiters = Db::fetchAll($waiters);
         $result = [];
         foreach ($waiters as $waiter) {
-            $result[] = User::find($waiter->user_id);
+            $user=User::find($waiter->user_id);
+            $user->date_added=$waiter->date_added;
+            $result[] = $user;
         }
         return $result;
     }
