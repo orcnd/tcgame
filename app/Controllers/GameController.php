@@ -36,7 +36,7 @@ class GameController
             'name' => 'Group Game (' . date('d/m/Y H:i:s') . ')',
         ]);
         $group->join(auth()->user());
-        redirect('/group/' . $group->id);
+        redirect('/group');
     }
 
     public function group()
@@ -44,6 +44,10 @@ class GameController
         $group = auth()
             ->user()
             ->group();
-        odump($group);
+        //group doesn't exist for some reason
+        if ($group === null) {
+            redirect('/game');
+        }
+        view('group', ['group' => $group]);
     }
 }
