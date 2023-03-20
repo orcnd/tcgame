@@ -7,26 +7,16 @@
     <div class="row">
         <div class="col-12">
             <h1><?php echo $group->name; ?></h1>
-            <?php if (
-                $group->creator_id == auth()->user()->id &&
-                count($group->users()) == 4
-            ) {
-                if ($group->status == 0) { ?>
-            <a href="/join" class="btn btn-primary btn-lg">Start the game Now!</a>
-            <?php } else { ?>
-            <a href="/join" class="btn btn-primary btn-lg">Stop the game Now!</a>
-            <?php }
-            } ?>
+            <b> Your Status: </b><span id="your_status"></span>
             <hr>
-            <span>
-            <b> Status: </b><?php echo $group->status == 0
-                ? 'Waiting'
-                : 'Playing'; ?>
+            <button id="set_ready_btn" class="btn btn-primary  ">Set Ready</button>
+            <button id="set_pending_btn" class="btn btn-primary">Set Pending</button>
+            <a id="go_play_btn" class="btn btn-primary" href="/play" >Go Play</a>
             
-            </span>
+            <a href="/start_game" id="start_game_btn" class="btn btn-primary d-none">Start Game</a>
         </div>
     </div>
-
+<hr>
     <div class="row">
         <div class="col-4">
             <h4>Players</h4>

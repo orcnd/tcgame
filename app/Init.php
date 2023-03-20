@@ -46,15 +46,16 @@ class Init
             'id int(11) primary key AUTO_INCREMENT',
             'name varchar(255)',
             'creator_id int(11)',
-            'status int(11)',
+            'status varchar(255)',
         ]);
 
         Db::createTable('tcgame_user_groups', [
             'id int(11) primary key AUTO_INCREMENT',
             'user_id int(11)',
             'group_id int(11)',
-            'sort int(11)',
+            'status varchar(255)',
             'date_added timestamp',
+            'date_removed timestamp',
         ]);
 
         require __DIR__ . '/helpers.php';

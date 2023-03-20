@@ -9,6 +9,11 @@ class Group
 
     protected static $fillable=['name','creator_id','status'];
 
+    public function startGame() {
+        $this->status='active';
+        $this->save();
+    }
+
     /**
      * Get the display name of the user
      *
@@ -83,15 +88,35 @@ class Group
             return "alreadyIn";
         }
         Db::insertQuery(
-            'INSERT INTO tcgame_user_groups (user_id, group_id,date_added) VALUES (:user_id, :group_id, NOW())',
+            'INSERT INTO tcgame_user_groups (user_id, group_id,status,date_added) VALUES (:user_id, :group_id, :status,NOW())',
             [
                 'user_id' => $user->id,
                 'group_id' => $this->id,
+                'status' => 'pending',
             ]
         );
         $user->status = 1;
         $user->save();
         return true;
+    }
+
+
+    /**
+     * remove user from group
+     *
+     * @param User $user
+     *
+     * @return void
+     */
+    public function setUserStatus(User $user, string $status) {
+       Db::query(
+            'UPDATE tcgame_user_groups SET status=:status WHERE user_id=:user_id AND group_id=:group_id',
+            [
+                'user_id' => $user->id,
+                'group_id' => $this->id,
+                'status' => $status,
+            ]
+        );
     }
 
     /**
@@ -318,7 +343,7 @@ class Group
     public function users(): array
     {
         $waiters = Db::query(
-            'SELECT user_id,date_added FROM tcgame_user_groups WHERE group_id = :group_id',
+            'SELECT user_id,date_added,status FROM tcgame_user_groups WHERE group_id = :group_id',
             [
                 'group_id' => $this->id,
             ]
@@ -334,6 +359,7 @@ class Group
             if ($user->id==$this->creator_id) {
                 $user->is_creator=true;
             }
+            $user->game_status=$waiter->status;
             $result[] = $user;
         }
         return $result;

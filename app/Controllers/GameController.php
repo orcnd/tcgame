@@ -70,6 +70,7 @@ class GameController
         $group = Group::create([
             'name' => 'Group Game (' . betterDate() . ')',
             'creator_id' => auth()->user()->id,
+            'status' => 'waiting',
         ]);
         $group->join(auth()->user());
         redirect('/group');
@@ -98,5 +99,44 @@ class GameController
             json(['users' => [], 'hash' => $hash, 'update' => false]);
         }
         json(['users' => $users, 'hash' => $hash, 'update' => true]);
+    }
+
+    public function startGame()
+    {
+        $group = auth()
+            ->user()
+            ->group();
+        //group doesn't exist for some reason
+        if ($group === null) {
+            return json(['status' => 'error', 'message' => 'Group not found']);
+        }
+        $group->startGame();
+        json(['status' => 'ok']);
+    }
+
+    public function setReady()
+    {
+        $group = auth()
+            ->user()
+            ->group();
+        //group doesn't exist for some reason
+        if ($group === null) {
+            return json(['status' => 'error', 'message' => 'Group not found']);
+        }
+        $group->setUserStatus(auth()->user(), 'ready');
+        json(['status' => 'ok']);
+    }
+
+    public function setPending()
+    {
+        $group = auth()
+            ->user()
+            ->group();
+        //group doesn't exist for some reason
+        if ($group === null) {
+            return json(['status' => 'error', 'message' => 'Group not found']);
+        }
+        $group->setUserStatus(auth()->user(), 'pending');
+        json(['status' => 'ok']);
     }
 }
