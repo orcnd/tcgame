@@ -76,6 +76,8 @@ class Db
      */
     public static function insertQuery(string $query, array $prepared)
     {
+        // strip new lines
+        $query = str_replace(["\r", "\n"], ' ', $query);
         $st = self::$pdo->prepare($query, $prepared);
         $st->execute($prepared);
         return self::$pdo->lastInsertId();
@@ -90,6 +92,8 @@ class Db
      */
     public static function query(string $query, array $prepared)
     {
+        // strip new lines
+        $query = str_replace(["\r", "\n"], ' ', $query);
         $st = self::$pdo->prepare($query, $prepared);
         $st->execute($prepared);
         return $st;

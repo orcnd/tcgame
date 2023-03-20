@@ -39,7 +39,7 @@ class Init
         Db::createTable('tcgame_users', [
             'id int(11) primary key AUTO_INCREMENT',
             'name varchar(255)',
-            'status int(11)',
+            'status varchar(255)',
         ]);
 
         Db::createTable('tcgame_groups', [
@@ -64,7 +64,7 @@ class Init
         foreach ($users as $user) {
             \App\Models\User::create([
                 'name' => $user,
-                'status' => '0',
+                'status' => 'active',
             ]);
         }
     }

@@ -343,7 +343,10 @@ class Group
     public function users(): array
     {
         $waiters = Db::query(
-            'SELECT user_id,date_added,status FROM tcgame_user_groups WHERE group_id = :group_id',
+            'SELECT tcgame_user_groups.user_id,tcgame_user_groups.date_added,tcgame_user_groups.status,
+            tcgame_users.name as user_name  FROM tcgame_user_groups
+            inner join tcgame_users on tcgame_users.id=tcgame_user_groups.user_id 
+              WHERE tcgame_user_groups.group_id = :group_id ',
             [
                 'group_id' => $this->id,
             ]
@@ -354,7 +357,7 @@ class Group
         $waiters = Db::fetchAll($waiters);
         $result = [];
         foreach ($waiters as $waiter) {
-            $user=User::find($waiter->user_id);
+            $user=new User($waiter->user_id,$waiter->user_name);
             $user->date_added=$waiter->date_added;
             if ($user->id==$this->creator_id) {
                 $user->is_creator=true;

@@ -8,6 +8,12 @@ class User
     public $id;
     public $name;
 
+    public function __construct($id = null, $name = null)
+    {
+        $this->id = $id !== null ? $id : null;
+        $this->name = $name !== null ? $name : null;
+    }
+
     /**
      * Get the display name of the user
      *

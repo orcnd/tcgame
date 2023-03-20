@@ -9,6 +9,11 @@
     echo isset($title) ? ' - ' . $title : '';
     ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <?php if (isset($extracss)) { ?>
+    <?php foreach ($extracss as $css) { ?>
+      <link href="<?php echo $css; ?>" rel="stylesheet">
+    <?php }} ?>
+
     <script>
       <?php if (auth()->check()) { ?>
         window.user = {
