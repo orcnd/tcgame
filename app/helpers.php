@@ -4,7 +4,7 @@ function view($adr, $vars = [], $print = true)
     extract($vars);
     ob_start();
 
-    $viewFile = __DIR__ . '/views/' . $adr . '.php';
+    $viewFile = __DIR__ . '/Views/' . $adr . '.php';
 
     if (!file_exists($viewFile)) {
         show_404(true);
