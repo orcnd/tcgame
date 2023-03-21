@@ -10,8 +10,8 @@ class User
 
     public function __construct($id = null, $name = null)
     {
-        $this->id = $id !== null ? $id : null;
-        $this->name = $name !== null ? $name : null;
+        $this->id = $id;
+        $this->name = $name;
     }
 
     /**

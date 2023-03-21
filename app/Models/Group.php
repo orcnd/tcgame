@@ -323,6 +323,11 @@ class Group
         return $result;
     }
 
+    /**
+     * returns total user count in groups
+     *
+     * @return array
+     */
     public function getUserCount()
     {
         $count = Db::query(
