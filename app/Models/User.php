@@ -8,6 +8,12 @@ class User
     public $id;
     public $name;
 
+    /**
+     * User constructor.
+     *
+     * @param int|null $id
+     * @param string|null $name
+     */
     public function __construct($id = null, $name = null)
     {
         $this->id = $id;
