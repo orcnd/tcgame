@@ -111,9 +111,13 @@ class GameController
             return json(['status' => 'error', 'message' => 'Group not found']);
         }
         $group->startGame();
-        json(['status' => 'ok']);
+        redirect('/play');
     }
 
+    public function play()
+    {
+        view('play');
+    }
     public function setReady()
     {
         $group = auth()

@@ -9,8 +9,13 @@ class Group
 
     protected static $fillable=['name','creator_id','status'];
 
+    private $statuses=[
+        'waiting'=>'Waiting',
+        'playing'=>'Playing',
+        'finished'=>'Finished',
+    ];
     public function startGame() {
-        $this->status='active';
+        $this->status='playing';
         $this->save();
     }
 
@@ -189,6 +194,12 @@ class Group
         return false;
     }
 
+
+    /*
+    * return user's add time to this group
+    *
+    * @return bool|string
+    */
     public function added_at(): bool|string {
         if(!$this->user) return false;
         $added_at=Db::query(

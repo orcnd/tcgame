@@ -29,7 +29,8 @@ Route::set('/group_wait_list', 'POST', [
 
 Route::set('/join_group/:id', 'GET', [GameController::class, 'joinGroup']);
 
-Route::set('/startGame', 'POST', [GameController::class, 'startGame']);
+Route::set('/start_game', 'GET', [GameController::class, 'startGame']);
+Route::set('/play', 'GET', [GameController::class, 'play']);
 
 Route::set('/setReady', 'POST', [GameController::class, 'setReady']);
 
