@@ -4,15 +4,7 @@ class Route
 {
     private static $routes = [];
 
-    /**
-     * setting route
-     *
-     * @param string $route route name
-     * @param string $method http method
-     * @param callable $callback callback function
-     *
-     * @return void
-     */
+    /** setting route */
     public static function set(
         string $route,
         string $method,
@@ -27,15 +19,8 @@ class Route
         ];
     }
 
-    /**
-     * run route
-     *
-     * @param string $route route name
-     * @param string $method http method
-     *
-     * @return bool
-     */
-    public static function run($route, $method) : bool
+    /** run route */
+    public static function run(string $route, string $method) : bool
     {
         $route = trim($route);
         $method = strtoupper(trim($method));
@@ -79,15 +64,8 @@ class Route
         return false;
     }
 
-    /**
-     * get route
-     *
-     * @param string $route route name
-     * @param string $method http method
-     *
-     * @return callable|bool
-     */
-    public static function get($route, $method) : bool|callable
+    /** get route */
+    public static function get(string $route, string $method) : bool|callable
     {
         $route = trim($route);
         $method = strtoupper(trim($method));

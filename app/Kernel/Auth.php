@@ -7,9 +7,7 @@ class Auth
 {
     public static $user = null;
 
-    /**
-     * initializes session
-     */
+    /** initializes session */
     public static function initialize() : void
     {
         if (!isset($_SESSION)) {
@@ -20,22 +18,14 @@ class Auth
         }
     }
 
-    /**
-     * checks if user is logged in
-     *
-     * @return bool
-     */
-    public static function check()
+    /** checks if user is logged in */
+    public static function check() : bool
     {
         return isset($_SESSION['user_id']);
     }
 
-    /**
-     * returns user
-     *
-     * @return User
-     */
-    public static function user()
+    /** returns user */
+    public static function user() : ?User
     {
         if (self::check()) {
             self::$user = User::find($_SESSION['user_id']);
@@ -45,12 +35,8 @@ class Auth
         return self::$user;
     }
 
-    /**
-     * logs in user
-     *
-     * @param string $user
-     */
-    public static function login(string $username)
+    /** logs in user */
+    public static function login(string $username) : bool
     {
         $user = User::findByUsername($username);
         if ($user === null) {
@@ -60,10 +46,8 @@ class Auth
         return true;
     }
 
-    /**
-     * logs out user
-     */
-    public static function logout()
+    /** logs out user */
+    public static function logout() : void
     {
         unset($_SESSION['user_id']);
     }

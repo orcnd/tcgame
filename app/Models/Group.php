@@ -15,6 +15,8 @@ class Group
         'playing'=>'Playing',
         'finished'=>'Finished',
     ];
+
+    /** starts the game */
     public function startGame() {
         $this->status='playing';
         $this->save();
@@ -85,6 +87,7 @@ class Group
     }
 
 
+    /** sets user game status */
     public function setUserStatus(User $user, string $status):void {
        Db::query(
             'UPDATE tcgame_user_groups SET status=:status WHERE user_id=:user_id AND group_id=:group_id',
@@ -149,7 +152,7 @@ class Group
     }
 
 
-    /*  return user's add time to this group */
+    /** user's add time to this group */
     public function added_at(): bool|string {
         if(!$this->user) return false;
         $added_at=Db::query(

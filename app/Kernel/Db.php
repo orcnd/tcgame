@@ -2,11 +2,17 @@
 namespace App\Kernel;
 use PDO;
 
+/** database class */
 class Db
 {
+    /** pdo object for db operations */
     private static $pdo = null;
+
+    /** database type mysql or sqlite */
     private static $type = null;
-    public static function initialize()
+
+    /** initializes mysql database */
+    public static function initialize() : void
     {
         self::$pdo = new PDO(
             'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME,
@@ -16,20 +22,15 @@ class Db
         self::$type = 'mysql';
     }
 
-    public static function initializeTest()
+    /** initializes test database sqlite memory */
+    public static function initializeTest() : void
     {
         self::$pdo = new PDO('sqlite::memory:');
         self::$type = 'sqlite';
     }
 
-    /**
-     * drop table(s)
-     *
-     * @param array|string $tables table or tables
-     *
-     * @return void
-     */
-    public static function dropTable($tables)
+    /** drop table(s) */
+    public static function dropTable($tables) : void
     {
         if (!is_array($tables)) {
             $tables = [$tables];
@@ -39,9 +40,7 @@ class Db
         }
     }
 
-    /**
-     * create a new table
-     */
+    /** create a new table */
     public static function createTable(string $name, array $columns) : void
     {
         $sql = 'CREATE TABLE IF NOT EXISTS ' . $name . ' (';
@@ -62,13 +61,7 @@ class Db
         self::$pdo->query($sql)->execute();
     }
 
-    /**
-     * mysql query
-     *
-     * @param string $query
-     *
-     * @return mixed
-     */
+    /** mysql query returns insert id */
     public static function insertQuery(string $query, array $prepared) : int|bool
     {
         // strip new lines
@@ -78,14 +71,8 @@ class Db
         return self::$pdo->lastInsertId();
     }
 
-    /**
-     * mysql query
-     *
-     * @param string $query
-     *
-     * @return mixed
-     */
-    public static function query(string $query, array $prepared)
+    /** mysql query */
+    public static function query(string $query, array $prepared) : \PDOStatement
     {
         // strip new lines
         $query = str_replace(["\r", "\n"], ' ', $query);
@@ -94,26 +81,14 @@ class Db
         return $st;
     }
 
-    /**
-     * fetch data
-     *
-     * @param \PDOStatement $state
-     *
-     * @return mixed
-     */
-    public static function fetch(\PDOStatement $state)
+    /**  fetch data */
+    public static function fetch(\PDOStatement $state) : mixed
     {
         return $state->fetch(PDO::FETCH_OBJ);
     }
 
-    /**
-     * fetch all data
-     *
-     * @param \PDOStatement $state
-     *
-     * @return mixed
-     */
-    public static function fetchAll(\PDOStatement $state)
+    /** fetch all data */
+    public static function fetchAll(\PDOStatement $state) : mixed
     {
         return $state->fetchAll(PDO::FETCH_OBJ);
     }

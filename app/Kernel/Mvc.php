@@ -8,12 +8,8 @@ class Mvc
         $this->controller_init();
     }
 
-    /**
-     * controller init
-     *
-     * @return void
-     */
-    private function controller_init()
+    /** controller init */
+    private function controller_init() : void
     {
         $status = Route::run(
             $_SERVER['REQUEST_URI'],

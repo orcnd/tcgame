@@ -4,29 +4,21 @@ namespace App\Models;
 use App\Kernel\Db;
 
 class User
-{
+{   
+    /** user id */
     public $id;
+
+    /** user name */
     public $name;
 
-    /**
-     * User constructor.
-     *
-     * @param int|null $id
-     * @param string|null $name
-     */
+    /** User constructor */
     public function __construct($id = null, $name = null)
     {
         $this->id = $id;
         $this->name = $name;
     }
 
-    /**
-     * Get the display name of the user
-     *
-     * @param bool $withId if true, the id will be added to the name
-     *
-     * @return string
-     */
+    /** Get the display name of the user */
     public function getDisplayName(bool $withId): string
     {
         if ($withId === true) {
@@ -35,13 +27,7 @@ class User
         return $this->name;
     }
 
-    /**
-     * creates user
-     *
-     * @param array $data
-     *
-     * @return User
-     */
+    /** creates user */
     public static function create(array $data): User
     {
         if (isset($data['status']) === false) {
@@ -57,23 +43,13 @@ class User
         return self::find($id);
     }
 
-    /**
-     * get users group
-     *
-     * @return Group
-     */
+    /** get users group */
     public function group()
     {
         return \App\Models\Group::bindToUser($this);
     }
 
-    /**
-     * finds user by id
-     *
-     * @param int $id
-     *
-     * @return User|null
-     */
+    /** finds user by id */
     public static function find(int $id)
     {
         $user = Db::query('SELECT * FROM tcgame_users WHERE id=:id', [
@@ -86,11 +62,7 @@ class User
         return null;
     }
 
-    /**
-     * saves changes of user
-     *
-     * @return void
-     */
+    /** saves changes of user */
 
     public function save()
     {
@@ -104,6 +76,7 @@ class User
         );
     }
 
+    /** fetches user from database */
     private static function fetchUser($userData)
     {
         $user = new User();
@@ -113,14 +86,8 @@ class User
         return $user;
     }
 
-    /**
-     * finds user by username
-     *
-     * @param string $username
-     *
-     * @return User|null
-     */
-    public static function findByUsername(string $username)
+    /** finds user by username */
+    public static function findByUsername(string $username) : ?User
     {
         $user = Db::query('SELECT * FROM tcgame_users WHERE name=:name', [
             'name' => $username,
