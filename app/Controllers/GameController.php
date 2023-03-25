@@ -9,6 +9,7 @@ class GameController
 {
     use ForceLogin;
 
+
     public function index()
     {
         /*
@@ -20,6 +21,7 @@ class GameController
             redirect('/group');
         }
         */
+        
         view('game');
     }
 

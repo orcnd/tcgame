@@ -3,6 +3,7 @@ namespace App\Models;
 
 use App\Models\User;
 use App\Kernel\Db;
+
 class Group
 {
     public $id,$name,$creator_id,$status;
@@ -19,13 +20,7 @@ class Group
         $this->save();
     }
 
-    /**
-     * Get the display name of the user
-     *
-     * @param bool $withId if true, the id will be added to the name
-     *
-     * @return string
-     */
+    /** Get the display name of the user */
     public function getDisplayName(bool $withId): string
     {
         if ($withId) {
@@ -34,13 +29,7 @@ class Group
         return $this->name;
     }
 
-    /**
-     * creates user
-     *
-     * @param array $data
-     *
-     * @return Group
-     */
+    /**  creates group */
     public static function create(array $data): Group
     {
         $id = Db::insertQuery(
@@ -60,11 +49,7 @@ class Group
         return $group;
     }
 
-    /** 
-     * saves changes of group
-     * 
-     * @return void
-     */
+    /** saves changes of group */
     public function save() {
 
         $sql='UPDATE tcgame_groups SET ';
@@ -79,13 +64,7 @@ class Group
         Db::insertQuery($sql,$params);
     }
 
-    /**
-     * join user to group
-     *
-     * @param User $user
-     *
-     * @return string|bool
-     */
+    /** join user to group */
     public function join(User $user) : string|bool
     {
         //self::removeUserFromAllGroups($user);
@@ -106,14 +85,7 @@ class Group
     }
 
 
-    /**
-     * remove user from group
-     *
-     * @param User $user
-     *
-     * @return void
-     */
-    public function setUserStatus(User $user, string $status) {
+    public function setUserStatus(User $user, string $status):void {
        Db::query(
             'UPDATE tcgame_user_groups SET status=:status WHERE user_id=:user_id AND group_id=:group_id',
             [
@@ -124,13 +96,7 @@ class Group
         );
     }
 
-    /**
-     * finds group by id
-     *
-     * @param int $id
-     *
-     * @return Group|bool
-     */
+    /**  finds group by id */
     public static function find(int $id): Group|bool
     {
         $group = Db::query(
@@ -153,13 +119,7 @@ class Group
         }
     }
 
-    /**
-     * finds group by user
-     *
-     * @param User $user
-     * 
-     * @return Group|bool
-     */
+    /**  finds group by user */
     public static function findByUser(User $user): Group|bool
     {
         $userGroup = Db::query(
@@ -177,13 +137,7 @@ class Group
     }
 
 
-    /**
-     * bind group model by user
-     *
-     * @param User $user
-     * 
-     * @return Group|bool
-     */
+    /** bind group model by user  */
     public static function bindToUser(User $user): Group|bool {
         $group=self::findByUser($user);
         if ($group) {
@@ -195,11 +149,7 @@ class Group
     }
 
 
-    /*
-    * return user's add time to this group
-    *
-    * @return bool|string
-    */
+    /*  return user's add time to this group */
     public function added_at(): bool|string {
         if(!$this->user) return false;
         $added_at=Db::query(
@@ -216,15 +166,8 @@ class Group
         return false;
     }
 
-    /**
-     * finds group by name
-     *
-     * @param string $name
-     *
-     * @return void
-     */
-    public function removeUser(User $user)
-    {
+    /** removing user from group */
+    public function removeUser(User $user) :void { 
         Db::query(
             'DELETE FROM tcgame_user_groups WHERE user_id = :user_id AND group_id = :group_id',
             [
@@ -245,14 +188,8 @@ class Group
         }
     }
 
-    /**
-     * removes user from all groups
-     *
-     * @param User $user
-     *
-     * @return void
-     */
-    public static function removeUserFromAllGroups(User $user)
+    /** removes user from all groups */
+    public static function removeUserFromAllGroups(User $user) :void
     {
         Db::query(
             'DELETE FROM tcgame_user_groups WHERE user_id = :user_id',
@@ -262,12 +199,8 @@ class Group
         );
     }
 
-    /**
-     * destroys group
-     *
-     * @return void
-     */
-    public function destroy()
+    /** destroys group */
+    public function destroy() :void
     {
         Db::query(
             'DELETE FROM tcgame_user_groups WHERE group_id = :group_id',
@@ -283,13 +216,7 @@ class Group
         );
     }
 
-    /**
-     * finds available group
-     *
-     * @param User $user
-     *
-     * @return array
-     */
+    /** finds available group */
     public static function findAvailableGroups(User $user): array
     {
         $groups = Db::query(
@@ -314,11 +241,7 @@ class Group
         }
     }
 
-    /**
-     * returns all groups
-     *
-     * @return array
-     */
+    /** returns all groups */
     public static function getAll(): array
     {
         $query = 'SELECT id FROM tcgame_groups';
@@ -334,11 +257,7 @@ class Group
         return $result;
     }
 
-    /**
-     * returns total user count in groups
-     *
-     * @return array
-     */
+    /** returns total user count in groups */
     public function getUserCount()
     {
         $count = Db::query(
@@ -351,11 +270,7 @@ class Group
         return $count;
     }
 
-    /**
-     * returns all users in group
-     *
-     * @return array
-     */
+    /** returns all users in group */
     public function users(): array
     {
         $waiters = Db::query(
@@ -384,11 +299,7 @@ class Group
         return $result;
     }
 
-    /**
-     * returns all active games
-     *
-     * @return array
-     */
+    /** returns all active games */
     public static function getActiveGames(): array
     {
         $groups = self::getAll();
@@ -401,11 +312,7 @@ class Group
         return $result;
     }
 
-    /**
-     * returns all active players
-     *
-     * @return array
-     */
+    /** returns all active players */
     public static function getActivePlayers(): array
     {
         $groups = self::getAll();
@@ -418,11 +325,7 @@ class Group
         return $result;
     }
 
-    /**
-     * returns waiting list
-     *
-     * @return array
-     */
+    /** returns waiting list */
     public static function getWaitingList(): array
     {
         $groups = self::getAll();

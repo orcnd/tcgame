@@ -2,6 +2,7 @@
 namespace App\Kernel;
 
 use App\Models\User;
+
 class Auth
 {
     public static $user = null;
@@ -9,7 +10,7 @@ class Auth
     /**
      * initializes session
      */
-    public static function initialize()
+    public static function initialize() : void
     {
         if (!isset($_SESSION)) {
             session_start();

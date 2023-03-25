@@ -41,13 +41,8 @@ class Db
 
     /**
      * create a new table
-     *
-     * @param string $name table name
-     * @param array $columns columns
-     *
-     * @return void
      */
-    public static function createTable(string $name, array $columns)
+    public static function createTable(string $name, array $columns) : void
     {
         $sql = 'CREATE TABLE IF NOT EXISTS ' . $name . ' (';
 
@@ -74,7 +69,7 @@ class Db
      *
      * @return mixed
      */
-    public static function insertQuery(string $query, array $prepared)
+    public static function insertQuery(string $query, array $prepared) : int|bool
     {
         // strip new lines
         $query = str_replace(["\r", "\n"], ' ', $query);
