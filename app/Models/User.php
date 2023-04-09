@@ -28,7 +28,7 @@ class User
     }
 
     /** creates user */
-    public static function create(array $data): User
+    public static function create(array $data,$test=false): User|null
     {
         if (isset($data['status']) === false) {
             $data['status'] = 0;
@@ -40,6 +40,7 @@ class User
                 'status' => $data['status'],
             ]
         );
+
         return self::find($id);
     }
 
@@ -50,13 +51,15 @@ class User
     }
 
     /** finds user by id */
-    public static function find(int $id)
+    public static function find(int $id) : ?User
     {
         $user = Db::query('SELECT * FROM tcgame_users WHERE id=:id', [
             'id' => $id,
         ]);
-        if ($user->rowCount() > 0) {
-            $userData = Db::fetch($user);
+    
+        $userData = Db::fetch($user);
+
+        if ($userData!==false) {
             return self::fetchUser($userData);
         }
         return null;

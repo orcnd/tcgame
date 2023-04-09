@@ -15,7 +15,7 @@ final class TestsGeneral extends TestCase
         \App\Init::install();
 
         $user = User::Create(['name' => 'test']);
-        $this->assertEquals($user->getDisplayName(true), '#1 test');
+        $this->assertEquals($user->getDisplayName(true), '#' . $user->id . ' test');
         print PHP_EOL . 'Display name show test passed';
     }
 
@@ -31,7 +31,7 @@ final class TestsGeneral extends TestCase
     public function testGroupModelCreate()
     {
         \App\Init::install();
-        $group = Group::create(['name' => 'test Group']);
+        $group = Group::create(['name' => 'test Group','creator_id'=>1,'status'=>'active']);
         $this->assertEquals($group->name, 'test Group');
         print PHP_EOL . 'Group create test passed';
     }

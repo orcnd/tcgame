@@ -26,7 +26,7 @@ class Db
     public static function initializeTest() : void
     {
         self::$pdo = new PDO('sqlite::memory:');
-        self::$type = 'sqlite';
+        self::$type = 'sqlite';        
     }
 
     /** drop table(s) */
@@ -72,7 +72,7 @@ class Db
     }
 
     /** mysql query */
-    public static function query(string $query, array $prepared) : \PDOStatement
+    public static function query(string $query, array $prepared=[]) : \PDOStatement
     {
         // strip new lines
         $query = str_replace(["\r", "\n"], ' ', $query);

@@ -28,12 +28,12 @@ class Init
      */
     public static function install($isTest = false)
     {
-        if (defined('TEST_MODE') && TEST_MODE) {
+        if ((defined('TEST_MODE') && TEST_MODE) || $isTest===true) {
             Db::initializeTest();
         } else {
             Db::initialize();
         }
-
+        
         DB::dropTable(['tcgame_users', 'tcgame_groups', 'tcgame_user_groups']);
 
         Db::createTable('tcgame_users', [
